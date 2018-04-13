@@ -35,11 +35,11 @@ func CreateDataPool(ctx context.Context, provider DataProvider, repeat time.Dura
     return &pool
 }
 
-func (dataPool *memoryDataPool) Get() interface{} {
+func (dataPool *memoryDataPool) Get() (interface{}, error) {
     dataPool.RLock()
     defer dataPool.RUnlock()
 
-    return dataPool.result
+    return dataPool.result, dataPool.err
 }
 
 type memoryDataPool struct {
