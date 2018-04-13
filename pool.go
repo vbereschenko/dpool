@@ -1,6 +1,6 @@
 // data pool example
 // ---------
-//    ctx, done := context.WithCancel(context.TODO())
+//    ctx, done := context.WithCancel(context.Background())
 //    pool := dpool.NewDataPool(ctx, func() (interface{}, error) {
 //        return "test", nil
 //    }, time.Second * 5)
@@ -13,7 +13,6 @@ import (
     "context"
     "time"
     "sync"
-    "fmt"
     "reflect"
     "errors"
 )
@@ -37,6 +36,8 @@ func NewDataPool(ctx context.Context, provider DataProvider, repeat time.Duratio
     return &pool
 }
 
+// provides actual values of DataProvider
+// thread-safe function
 func (dataPool *memoryDataPool) Get() (interface{}, error) {
     dataPool.RLock()
     defer dataPool.RUnlock()
@@ -44,6 +45,9 @@ func (dataPool *memoryDataPool) Get() (interface{}, error) {
     return dataPool.result, dataPool.err
 }
 
+// fills object by pointer provided
+// this method checks if pointer is provided and if types of stored value
+// equals to value that is requested to fill
 func (dataPool *memoryDataPool) FetchInto(result interface{}) error {
     dataPool.RLock()
     defer dataPool.RUnlock()
@@ -77,7 +81,6 @@ func (dataPool *memoryDataPool) run(ctx context.Context) {
     for {
         select {
         case <- ctx.Done():
-            fmt.Println("Background task finished")
             return
 
         case <- dataPool.repeat.C:
