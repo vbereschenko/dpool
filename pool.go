@@ -22,7 +22,7 @@ type DataProvider func() (interface{}, error)
 
 type DataPool interface {
     Get() (interface{}, error)
-    FetchInto(*interface{}) error
+    FetchInto(interface{}) error
 }
 
 func NewDataPool(ctx context.Context, provider DataProvider, repeat time.Duration) *memoryDataPool {
