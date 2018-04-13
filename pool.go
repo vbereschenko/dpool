@@ -52,6 +52,8 @@ type memoryDataPool struct {
 }
 
 func (dataPool *memoryDataPool) run(ctx context.Context) {
+    var resultBuffer interface{}
+    var errBuffer error
     for {
         select {
         case <- ctx.Done():
@@ -59,8 +61,11 @@ func (dataPool *memoryDataPool) run(ctx context.Context) {
             return
 
         case <- dataPool.repeat.C:
+            // fetching before locking
+            resultBuffer, errBuffer = dataPool.provider()
+
             dataPool.Lock()
-            dataPool.result, dataPool.err = dataPool.provider()
+            dataPool.result, dataPool.err = resultBuffer, errBuffer
             dataPool.Unlock()
         }
     }
