@@ -49,6 +49,10 @@ func (dataPool *memoryDataPool) Get() (interface{}, error) {
 // this method checks if pointer is provided and if types of stored value
 // equals to value that is requested to fill
 func (dataPool *memoryDataPool) FetchInto(result interface{}) error {
+    if dataPool.err != nil {
+        return dataPool.err
+    }
+
     dataPool.RLock()
     defer dataPool.RUnlock()
 
